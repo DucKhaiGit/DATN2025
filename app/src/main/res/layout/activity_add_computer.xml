@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F5F5F5">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- CardView bao quanh các trường nhập liệu -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="8dp"
+            app:cardBackgroundColor="#FFFFFF"
+            android:layout_marginBottom="16dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="24dp">
+
+                <!-- Tiêu đề -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Thêm Máy Tính"
+                    android:textSize="24sp"
+                    android:textStyle="bold"
+                    android:textColor="#212121"
+                    android:layout_marginBottom="24dp"/>
+
+                <!-- Trường Mã máy tính -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Mã máy tính"
+                    app:hintTextColor="#757575"
+                    app:boxStrokeColor="#3F51B5"
+                    app:boxBackgroundMode="outline"
+                    android:layout_marginBottom="16dp">
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etComputerCode"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="text"
+                        android:textColor="#212121"
+                        android:textSize="16sp"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Spinner CPU -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="CPU"
+                    app:hintTextColor="#757575"
+                    app:boxStrokeColor="#3F51B5"
+                    app:boxBackgroundMode="outline"
+                    android:layout_marginBottom="16dp">
+                    <Spinner
+                        android:id="@+id/spinnerCPU"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:prompt="@string/cpu_prompt"
+                        android:background="@null"
+                        android:spinnerMode="dropdown"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Spinner RAM -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="RAM"
+                    app:hintTextColor="#757575"
+                    app:boxStrokeColor="#3F51B5"
+                    app:boxBackgroundMode="outline"
+                    android:layout_marginBottom="16dp">
+                    <Spinner
+                        android:id="@+id/spinnerRAM"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:prompt="@string/ram_prompt"
+                        android:background="@null"
+                        android:spinnerMode="dropdown"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Spinner GPU -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="GPU"
+                    app:hintTextColor="#757575"
+                    app:boxStrokeColor="#3F51B5"
+                    app:boxBackgroundMode="outline"
+                    android:layout_marginBottom="16dp">
+                    <Spinner
+                        android:id="@+id/spinnerGPU"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:prompt="@string/gpu_prompt"
+                        android:background="@null"
+                        android:spinnerMode="dropdown"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Trường Ổ cứng -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Ổ cứng"
+                    app:hintTextColor="#757575"
+                    app:boxStrokeColor="#3F51B5"
+                    app:boxBackgroundMode="outline"
+                    android:layout_marginBottom="16dp">
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etStorage"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="text"
+                        android:textColor="#212121"
+                        android:textSize="16sp"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Spinner Trạng thái -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Trạng thái"
+                    app:hintTextColor="#757575"
+                    app:boxStrokeColor="#3F51B5"
+                    app:boxBackgroundMode="outline"
+                    android:layout_marginBottom="24dp">
+                    <Spinner
+                        android:id="@+id/spinnerStatus"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:prompt="@string/status_prompt"
+                        android:background="@null"
+                        android:spinnerMode="dropdown"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Nút điều khiển -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginTop="16dp">
+
+            <Button
+                android:id="@+id/btnAddComputer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Thêm máy tính"
+                android:textSize="16sp"
+                android:textAllCaps="false"
+                android:backgroundTint="#3F51B5"
+                android:textColor="#FFFFFF"
+                app:cornerRadius="8dp"
+                android:padding="12dp"
+                android:layout_marginEnd="16dp"/>
+
+            <Button
+                android:id="@+id/btnBackToHome"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Quay về trang chủ"
+                android:textSize="16sp"
+                android:textAllCaps="false"
+                android:backgroundTint="#757575"
+                android:textColor="#FFFFFF"
+                app:cornerRadius="8dp"
+                android:padding="12dp"/>
+        </LinearLayout>
+
+    </LinearLayout>
+</ScrollView>

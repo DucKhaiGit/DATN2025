@@ -1,0 +1,7 @@
+<resources>
+    <string-array name="status_options">
+        <item>Hoạt động</item>
+        <item>Bảo trì</item>
+        <item>Hỏng</item>
+    </string-array>
+</resources>

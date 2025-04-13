@@ -1,0 +1,47 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="#F5F5F5">
+
+    <TextView
+        android:id="@+id/tvComputerCode"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Mã máy:"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="#212121"
+        android:paddingBottom="12dp"
+        android:background="@android:drawable/editbox_background_normal"
+        android:padding="8dp"
+        android:layout_marginBottom="8dp" />
+
+    <TextView
+        android:id="@+id/tvUsageTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Thời gian sử dụng:"
+        android:textSize="16sp"
+        android:textColor="#424242"
+        android:padding="8dp"
+        android:paddingBottom="12dp"
+        android:background="#FFFFFF"
+        android:elevation="2dp"
+        android:layout_marginBottom="8dp" />
+
+    <TextView
+        android:id="@+id/tvTotalCost"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Tiền cần thanh toán:"
+        android:textSize="16sp"
+        android:textColor="#D81B60"
+        android:padding="8dp"
+        android:paddingBottom="12dp"
+        android:background="#FFFFFF"
+        android:elevation="2dp"
+        android:layout_marginBottom="8dp" />
+
+</LinearLayout>

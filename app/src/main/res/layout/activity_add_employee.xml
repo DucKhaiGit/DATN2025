@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F5F5F5">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- CardView bao quanh các trường nhập liệu -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="8dp"
+            app:cardBackgroundColor="#FFFFFF"
+            android:layout_marginBottom="16dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="24dp">
+
+                <!-- Tiêu đề -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Thêm Nhân Viên"
+                    android:textSize="24sp"
+                    android:textStyle="bold"
+                    android:textColor="#212121"
+                    android:layout_marginBottom="24dp"/>
+
+                <!-- Trường Mã nhân viên -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Mã nhân viên"
+                    app:hintTextColor="#757575"
+                    app:boxStrokeColor="#3F51B5"
+                    app:boxBackgroundMode="outline"
+                    android:layout_marginBottom="16dp">
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etEmployeeCode"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="text"
+                        android:textColor="#212121"
+                        android:textSize="16sp"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Trường Tên nhân viên -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Tên nhân viên"
+                    app:hintTextColor="#757575"
+                    app:boxStrokeColor="#3F51B5"
+                    app:boxBackgroundMode="outline"
+                    android:layout_marginBottom="16dp">
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etEmployeeName"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textPersonName"
+                        android:textColor="#212121"
+                        android:textSize="16sp"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Trường Số điện thoại -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Số điện thoại"
+                    app:hintTextColor="#757575"
+                    app:boxStrokeColor="#3F51B5"
+                    app:boxBackgroundMode="outline"
+                    android:layout_marginBottom="16dp">
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etEmployeePhone"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="phone"
+                        android:textColor="#212121"
+                        android:textSize="16sp"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Spinner Vai trò -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Vai trò"
+                    app:hintTextColor="#757575"
+                    app:boxStrokeColor="#3F51B5"
+                    app:boxBackgroundMode="outline"
+                    android:layout_marginBottom="16dp">
+                    <Spinner
+                        android:id="@+id/spRole"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@null"
+                        android:spinnerMode="dropdown"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Spinner Ca làm việc -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Ca làm việc"
+                    app:hintTextColor="#757575"
+                    app:boxStrokeColor="#3F51B5"
+                    app:boxBackgroundMode="outline"
+                    android:layout_marginBottom="24dp">
+                    <Spinner
+                        android:id="@+id/spShift"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@null"
+                        android:spinnerMode="dropdown"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Nút điều khiển -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginTop="16dp">
+
+            <Button
+                android:id="@+id/btnAddEmployee"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Thêm nhân viên"
+                android:textSize="16sp"
+                android:textAllCaps="false"
+                android:backgroundTint="#3F51B5"
+                android:textColor="#FFFFFF"
+                app:cornerRadius="8dp"
+                android:padding="12dp"
+                android:layout_marginEnd="16dp"/>
+
+            <Button
+                android:id="@+id/btnBackToHome"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Quay về trang chủ"
+                android:textSize="16sp"
+                android:textAllCaps="false"
+                android:backgroundTint="#757575"
+                android:textColor="#FFFFFF"
+                app:cornerRadius="8dp"
+                android:padding="12dp"/>
+        </LinearLayout>
+
+    </LinearLayout>
+</ScrollView>

@@ -1,0 +1,19 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_computers"
+        android:icon="@drawable/icon_pc"
+        android:title="Máy tính" />
+    <item
+        android:id="@+id/nav_employees"
+        android:icon="@drawable/icon_employee"
+        android:title="Nhân Viên" />
+    <item
+        android:id="@+id/nav_payments"
+        android:icon="@drawable/icon_bill"
+        android:title="Hóa Đơn" />
+
+    <item
+        android:id="@+id/nav_user"
+        android:icon="@drawable/icon_user"
+        android:title="Tài khoản" />
+</menu>
