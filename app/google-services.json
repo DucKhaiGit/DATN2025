@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1059358235668",
+    "project_id": "duckhai-datn2025",
+    "storage_bucket": "duckhai-datn2025.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1059358235668:android:1c6c0c16a4ade76a049b01",
+        "android_client_info": {
+          "package_name": "com.example.quanlyquannet"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBiLTzl6Cr5RpJfCIpEdKZWFPsP3p9HHAA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
