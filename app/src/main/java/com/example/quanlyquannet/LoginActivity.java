@@ -8,6 +8,7 @@ import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
@@ -25,6 +26,8 @@ public class LoginActivity extends AppCompatActivity {
     private TextInputEditText etPassword;
     private Button btnLogin;
     private TextView tvRegister;
+    private ProgressBar progressBar;
+    private View overlay;
 
     private FirebaseAuth auth;
     private FirebaseFirestore db;
@@ -45,14 +48,16 @@ public class LoginActivity extends AppCompatActivity {
         etPassword = findViewById(R.id.et_password);
         btnLogin = findViewById(R.id.btn_login);
         tvRegister = findViewById(R.id.tv_register);
+        progressBar = findViewById(R.id.progress_bar);
+        overlay = findViewById(R.id.overlay);
 
         // Kiểm tra xem người dùng đã đăng nhập chưa
-//        if (auth.getCurrentUser() != null) {
-//            // Nếu đã đăng nhập, điều hướng thẳng đến MainActivity
-//            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-//            startActivity(intent);
-//            finish();
-//        }
+        if (auth.getCurrentUser() != null) {
+            // Nếu đã đăng nhập, điều hướng thẳng đến MainActivity
+            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+            startActivity(intent);
+            finish();
+        }
 
         // Thiết lập sự kiện cho TextView Đăng Ký
         tvRegister.setOnClickListener(new View.OnClickListener() {
@@ -101,6 +106,9 @@ public class LoginActivity extends AppCompatActivity {
                     return;
                 }
 
+                // Hiển thị loading
+                showLoading(true);
+
                 // Tạo email giả định từ username
                 final String email = username + "@yourapp.com";
 
@@ -119,6 +127,9 @@ public class LoginActivity extends AppCompatActivity {
                                             .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                                                 @Override
                                                 public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                                    // Ẩn loading sau khi nhận phản hồi từ Firestore
+                                                    showLoading(false);
+
                                                     if (task.isSuccessful()) {
                                                         DocumentSnapshot document = task.getResult();
                                                         if (document.exists()) {
@@ -150,6 +161,8 @@ public class LoginActivity extends AppCompatActivity {
                                                 }
                                             });
                                 } else {
+                                    // Ẩn loading nếu đăng nhập thất bại
+                                    showLoading(false);
                                     Toast.makeText(LoginActivity.this, "Đăng nhập thất bại: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                                 }
                             }
@@ -162,5 +175,17 @@ public class LoginActivity extends AppCompatActivity {
         ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    }
+
+    private void showLoading(boolean isLoading) {
+        if (isLoading) {
+            progressBar.setVisibility(View.VISIBLE);
+            overlay.setVisibility(View.VISIBLE);
+            btnLogin.setEnabled(false); // Vô hiệu hóa nút Đăng Nhập
+        } else {
+            progressBar.setVisibility(View.GONE);
+            overlay.setVisibility(View.GONE);
+            btnLogin.setEnabled(true); // Kích hoạt lại nút Đăng Nhập
+        }
     }
 }
