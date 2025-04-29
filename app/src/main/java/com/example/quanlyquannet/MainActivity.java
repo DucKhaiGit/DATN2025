@@ -78,8 +78,9 @@ public class MainActivity extends AppCompatActivity {
                     Intent paymentIntent = new Intent(MainActivity.this, PaymentListActivity.class);
                     startActivity(paymentIntent);
                     return true;
-                } else if (item.getItemId() == R.id.nav_user) {
-                    // Thêm logic cho nav_user nếu cần
+                } else if (item.getItemId() == R.id.nav_settings) {
+                    Intent settingsIntent = new Intent(MainActivity.this, SettingsActivity.class);
+                    startActivity(settingsIntent);
                     return true;
                 } else {
                     return false;

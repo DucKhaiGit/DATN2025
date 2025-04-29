@@ -1,7 +1,9 @@
 package com.example.quanlyquannet;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
 import androidx.appcompat.app.AppCompatActivity;
@@ -14,15 +16,27 @@ public class ComputerListActivity extends AppCompatActivity {
     private Button btnAddComputer;
     private ComputerAdapter adapter;
     private ArrayList<Computer> computerList;
+    private SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_computer_list);
 
+        // Khởi tạo SharedPreferences
+        sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+        String role = sharedPreferences.getString("role", "guest");
+
         lvComputers = findViewById(R.id.lvComputers);
         btnAddComputer = findViewById(R.id.btnAddComputer);
         dbHelper = new NetCafeDatabase(this);
+
+        // Ẩn nút Thêm Máy Tính nếu người dùng là guest
+        if (role.equals("guest")) {
+            btnAddComputer.setVisibility(View.GONE);
+        } else {
+            btnAddComputer.setVisibility(View.VISIBLE);
+        }
 
         // Lấy danh sách máy tính từ cơ sở dữ liệu
         computerList = dbHelper.getAllComputers();
@@ -40,7 +54,7 @@ public class ComputerListActivity extends AppCompatActivity {
             finish();
         });
 
-        // Sự kiện bấm nút "Thêm Máy Tính"
+        // Sự kiện bấm nút "Thêm Máy Tính" (chỉ hiển thị cho admin)
         btnAddComputer.setOnClickListener(v -> {
             Intent intent = new Intent(ComputerListActivity.this, AddComputerActivity.class);
             startActivityForResult(intent, 1);
