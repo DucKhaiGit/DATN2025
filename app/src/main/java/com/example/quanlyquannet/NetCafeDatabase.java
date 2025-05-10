@@ -6,11 +6,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
-import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
 public class NetCafeDatabase extends SQLiteOpenHelper {
 
@@ -32,17 +29,12 @@ public class NetCafeDatabase extends SQLiteOpenHelper {
                 "gpu TEXT NOT NULL, " +
                 "storage TEXT NOT NULL, " +
                 "status TEXT NOT NULL, " +
+                "macAddress TEXT, " +
+                "ipAddress TEXT, " +
                 "inventoryId INTEGER, " +
                 "dateAdded TEXT NOT NULL, " +
                 "FOREIGN KEY (inventoryId) REFERENCES Inventory(id))");
 
-        // Bảng Trạng thái máy tính
-        db.execSQL("CREATE TABLE ComputerStatus (" +
-                "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                "status TEXT UNIQUE NOT NULL)");
-
-        // Thêm dữ liệu mặc định cho bảng ComputerStatus
-        db.execSQL("INSERT INTO ComputerStatus (status) VALUES ('Đang sử dụng'), ('Bảo trì'), ('Không hoạt động')");
         // Bảng Nhân viên
         db.execSQL("CREATE TABLE Employee (" +
                 "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
@@ -62,7 +54,6 @@ public class NetCafeDatabase extends SQLiteOpenHelper {
         // Thêm dữ liệu mẫu vào bảng Role
         db.execSQL("INSERT INTO Role (roleName) VALUES ('Quản lý'), ('Kỹ thuật viên'), ('Lễ tân'), ('Nhân viên vệ sinh'), ('Phục vụ')");
 
-
         // Bảng Ca làm việc
         db.execSQL("CREATE TABLE Shift (" +
                 "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
@@ -71,68 +62,18 @@ public class NetCafeDatabase extends SQLiteOpenHelper {
         // Thêm dữ liệu mẫu vào bảng Shift
         db.execSQL("INSERT INTO Shift (shiftTime) VALUES ('Ca sáng'), ('Ca chiều'), ('Ca tối'), ('Cả ngày'), ('Ca linh hoạt')");
 
-        // Bảng Lịch sử bảo trì
-        db.execSQL("CREATE TABLE MaintenanceHistory (" +
-                "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                "computerId INTEGER, " +
-                "maintenanceDate TEXT NOT NULL, " +
-                "issue TEXT NOT NULL, " +
-                "solution TEXT NOT NULL, " +
-                "FOREIGN KEY (computerId) REFERENCES Computer(id))");
-
-        // Bảng Chấm công
-        db.execSQL("CREATE TABLE Attendance (" +
-                "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                "employeeId INTEGER, " +
-                "date TEXT NOT NULL, " +
-                "shiftId INTEGER, " +
-                "hoursWorked INTEGER NOT NULL, " +
-                "FOREIGN KEY (employeeId) REFERENCES Employee(id), " +
-                "FOREIGN KEY (shiftId) REFERENCES Shift(id))");
-
-        // Bảng Kho linh kiện
-        db.execSQL("CREATE TABLE Inventory (" +
-                "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                "itemName TEXT NOT NULL, " +
-                "quantity INTEGER NOT NULL)");
-
-        // Bảng Khách hàng
-        db.execSQL("CREATE TABLE Customer (" +
-                "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                "customerCode TEXT UNIQUE NOT NULL, " +
-                "name TEXT NOT NULL, " +
-                "phone TEXT NOT NULL, " +
-                "registrationDate TEXT NOT NULL)");
-
-        // Bảng Phiên sử dụng máy tính (Session)
-        db.execSQL("CREATE TABLE Session (" +
-                "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                "computerId INTEGER NOT NULL, " +
-                "customerId INTEGER NOT NULL, " +
-                "employeeId INTEGER NOT NULL, " +
-                "startTime TEXT NOT NULL, " +
-                "endTime TEXT NOT NULL, " +
-                "FOREIGN KEY (computerId) REFERENCES Computer(id), " +
-                "FOREIGN KEY (customerId) REFERENCES Customer(id), " +
-                "FOREIGN KEY (employeeId) REFERENCES Employee(id))");
-
-        // Tạo bảng UsageLog
-        db.execSQL("CREATE TABLE IF NOT EXISTS UsageLog (" +
-                "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                "computerId INTEGER NOT NULL, " +
-                "startTime TEXT NOT NULL, " +
-                "endTime TEXT, " +
-                "duration INTEGER, " +
-                "FOREIGN KEY (computerId) REFERENCES Computer (id) ON DELETE CASCADE" +
-                ");");
-
-        // Tạo bảng Payment
-        db.execSQL("CREATE TABLE IF NOT EXISTS Payment (" +
-                "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                "usageLogId INTEGER NOT NULL, " +
-                "totalCost INTEGER NOT NULL, " +
-                "FOREIGN KEY (usageLogId) REFERENCES UsageLog (id) ON DELETE CASCADE" +
-                ");");
+        // Thêm máy tính mẫu với thông tin WoL
+        ContentValues computerValues = new ContentValues();
+        computerValues.put("code", "PC-001");
+        computerValues.put("cpu", "Intel Core i5-10400");
+        computerValues.put("ram", "16GB DDR4");
+        computerValues.put("gpu", "NVIDIA GTX 1660 Super");
+        computerValues.put("storage", "512GB SSD + 1TB HDD");
+        computerValues.put("status", "available");
+        computerValues.put("macAddress", "408D5C1C5754");
+        computerValues.put("ipAddress", "192.168.1.202");
+        computerValues.put("dateAdded", "2025-05-10");
+        db.insert("Computer", null, computerValues);
     }
 
     @Override
@@ -156,13 +97,10 @@ public class NetCafeDatabase extends SQLiteOpenHelper {
     public ArrayList<Computer> getAllComputers() {
         ArrayList<Computer> computers = new ArrayList<>();
 
-        // Mở kết nối cơ sở dữ liệu
         SQLiteDatabase db = this.getReadableDatabase();
 
-        // Truy vấn dữ liệu với JOIN để lấy thông tin trạng thái
-        String query = "SELECT c.id, c.code, c.cpu, c.ram, c.gpu, c.storage, cs.status, c.dateAdded " +
-                "FROM Computer c " +
-                "JOIN ComputerStatus cs ON c.status = cs.id";
+        String query = "SELECT c.id, c.code, c.cpu, c.ram, c.gpu, c.storage, c.status, c.macAddress, c.ipAddress, c.dateAdded " +
+                "FROM Computer c";
 
         Cursor cursor = db.rawQuery(query, null);
 
@@ -174,20 +112,21 @@ public class NetCafeDatabase extends SQLiteOpenHelper {
                 String ram = cursor.getString(3);
                 String gpu = cursor.getString(4);
                 String storage = cursor.getString(5);
-                String status = cursor.getString(6);  // Tên trạng thái từ bảng ComputerStatus
-                String dateAdded = cursor.getString(7);
+                String status = cursor.getString(6);
+                String macAddress = cursor.getString(7);
+                String ipAddress = cursor.getString(8);
+                String dateAdded = cursor.getString(9);
 
-                // Thêm máy tính vào danh sách
-                computers.add(new Computer(id, code, cpu, ram, gpu, storage, status, dateAdded));
+                computers.add(new Computer(id, code, cpu, ram, gpu, storage, status, macAddress, ipAddress, dateAdded));
             } while (cursor.moveToNext());
         }
 
-        // Đóng con trỏ và cơ sở dữ liệu
         cursor.close();
         db.close();
 
         return computers;
     }
+
     // Thêm nhân viên mới vào bảng Employee
     public long insertEmployee(String employeeCode, String name, String phone, int roleId, int shiftId) {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -200,12 +139,12 @@ public class NetCafeDatabase extends SQLiteOpenHelper {
 
         return db.insert("Employee", null, values);
     }
+
     // Phương thức lấy danh sách nhân viên từ bảng Employee
     public ArrayList<String> getAllEmployees() {
         ArrayList<String> employeeList = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
 
-        // Truy vấn dữ liệu nhân viên cùng với vai trò và ca làm việc
         String query = "SELECT e.name, e.phone, r.roleName, s.shiftTime " +
                 "FROM Employee e " +
                 "LEFT JOIN Role r ON e.roleId = r.id " +
@@ -214,13 +153,11 @@ public class NetCafeDatabase extends SQLiteOpenHelper {
 
         if (cursor.moveToFirst()) {
             do {
-                // Lấy dữ liệu từng cột
                 String name = cursor.getString(0);
                 String phone = cursor.getString(1);
                 String role = cursor.getString(2);
                 String shift = cursor.getString(3);
 
-                // Format thông tin nhân viên
                 String employeeInfo = "Tên: " + name + "\n" +
                         "SĐT: " + phone + "\n" +
                         "Vai trò: " + (role != null ? role : "Chưa phân vai trò") + "\n" +
@@ -231,12 +168,13 @@ public class NetCafeDatabase extends SQLiteOpenHelper {
         cursor.close();
         return employeeList;
     }
+
     // Phương thức xóa nhân viên theo ID
     public boolean deleteEmployeeById(int employeeId) {
         SQLiteDatabase db = this.getWritableDatabase();
         int rowsAffected = db.delete("Employee", "id = ?", new String[]{String.valueOf(employeeId)});
         db.close();
-        return rowsAffected > 0; // Trả về true nếu xóa thành công
+        return rowsAffected > 0;
     }
 
     // Phương thức cập nhật thông tin nhân viên
@@ -251,7 +189,7 @@ public class NetCafeDatabase extends SQLiteOpenHelper {
 
         int rowsAffected = db.update("Employee", values, "id = ?", new String[]{String.valueOf(employeeId)});
         db.close();
-        return rowsAffected > 0; // Trả về true nếu cập nhật thành công
+        return rowsAffected > 0;
     }
 
     public ArrayList<Integer> getAllEmployeeIds() {
@@ -261,7 +199,6 @@ public class NetCafeDatabase extends SQLiteOpenHelper {
 
         if (cursor != null) {
             while (cursor.moveToNext()) {
-                // Lấy ID của nhân viên từ cột đầu tiên (cột "id")
                 int id = cursor.getInt(0);
                 employeeIds.add(id);
             }
@@ -270,78 +207,21 @@ public class NetCafeDatabase extends SQLiteOpenHelper {
         db.close();
         return employeeIds;
     }
-    public void updateComputerStatus(int computerId, String status) {
+
+    // Phương thức thêm máy tính mới
+    public long insertComputer(String code, String cpu, String ram, String gpu, String storage, String status, String macAddress, String ipAddress, String dateAdded) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
+        values.put("code", code);
+        values.put("cpu", cpu);
+        values.put("ram", ram);
+        values.put("gpu", gpu);
+        values.put("storage", storage);
+        values.put("status", status);
+        values.put("macAddress", macAddress);
+        values.put("ipAddress", ipAddress);
+        values.put("dateAdded", dateAdded);
 
-        // Lấy id của trạng thái trong bảng ComputerStatus
-        Cursor cursor = db.rawQuery("SELECT id FROM ComputerStatus WHERE status = ?", new String[]{status});
-        if (cursor.moveToFirst()) {
-            int statusId = cursor.getInt(0);
-            values.put("status", statusId);
-            db.update("Computer", values, "id = ?", new String[]{String.valueOf(computerId)});
-        }
-        cursor.close();
+        return db.insert("Computer", null, values);
     }
-
-    public ArrayList<Payment> getAllPayments() {
-        ArrayList<Payment> payments = new ArrayList<>();
-
-        // Mở kết nối cơ sở dữ liệu
-        SQLiteDatabase db = this.getReadableDatabase();
-
-        // Truy vấn tất cả các bản ghi từ bảng Payment
-        String query = "SELECT id, usageLogId, totalCost FROM Payment";
-        Cursor cursor = db.rawQuery(query, null);
-
-        if (cursor.moveToFirst()) {
-            do {
-                // Lấy dữ liệu từ từng cột theo chỉ số cột
-                int id = cursor.getInt(0);             // Cột 0: id
-                int usageLogId = cursor.getInt(1);     // Cột 1: usageLogId
-                int totalCost = cursor.getInt(2);      // Cột 2: totalCost
-
-                // Tạo đối tượng Payment và thêm vào danh sách
-                payments.add(new Payment(id, usageLogId, totalCost));
-            } while (cursor.moveToNext());
-        }
-
-        // Đóng con trỏ và cơ sở dữ liệu
-        cursor.close();
-        db.close();
-
-        return payments;
-    }
-
-    public UsageLog getUsageLogById(int usageLogId) {
-        SQLiteDatabase db = this.getReadableDatabase();
-        UsageLog usageLog = null;
-
-        // Truy vấn thông tin UsageLog dựa trên usageLogId
-        String query = "SELECT id, computerId, startTime, endTime FROM UsageLog WHERE id = ?";
-        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(usageLogId)});
-
-        if (cursor.moveToFirst()) {
-            int id = cursor.getInt(0);
-            int computerId = cursor.getInt(1);
-            long startTime = cursor.getLong(2);
-            long endTime = cursor.getLong(3);
-
-            usageLog = new UsageLog(id, computerId, startTime, endTime);
-        }
-
-        cursor.close();
-        db.close();
-
-        return usageLog;
-    }
-
-
-
-
-
-
-
-
-
 }
