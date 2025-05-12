@@ -7,12 +7,16 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import com.google.firebase.firestore.FirebaseFirestore;
+
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class NetCafeDatabase extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "NetCafeDB";
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
 
     public NetCafeDatabase(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -78,19 +82,48 @@ public class NetCafeDatabase extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS Computer");
-        db.execSQL("DROP TABLE IF EXISTS ComputerStatus");
-        db.execSQL("DROP TABLE IF EXISTS Employee");
-        db.execSQL("DROP TABLE IF EXISTS Role");
-        db.execSQL("DROP TABLE IF EXISTS Shift");
-        db.execSQL("DROP TABLE IF EXISTS MaintenanceHistory");
-        db.execSQL("DROP TABLE IF EXISTS Attendance");
-        db.execSQL("DROP TABLE IF EXISTS Inventory");
-        db.execSQL("DROP TABLE IF EXISTS Customer");
-        db.execSQL("DROP TABLE IF EXISTS Session");
-        db.execSQL("DROP TABLE IF EXISTS Payment");
-        db.execSQL("DROP TABLE IF EXISTS UsageLog");
-        onCreate(db);
+        if (oldVersion < 2) {
+            db.execSQL("ALTER TABLE Computer ADD COLUMN macAddress TEXT");
+            db.execSQL("ALTER TABLE Computer ADD COLUMN ipAddress TEXT");
+
+            ContentValues computerValues = new ContentValues();
+            computerValues.put("code", "PC-001");
+            computerValues.put("cpu", "Intel Core i5-10400");
+            computerValues.put("ram", "16GB DDR4");
+            computerValues.put("gpu", "NVIDIA GTX 1660 Super");
+            computerValues.put("storage", "512GB SSD + 1TB HDD");
+            computerValues.put("status", "available");
+            computerValues.put("macAddress", "408D5C1C5754");
+            computerValues.put("ipAddress", "192.168.1.202");
+            computerValues.put("dateAdded", "2025-05-10");
+            db.insert("Computer", null, computerValues);
+        }
+    }
+
+    // Phương thức đồng bộ dữ liệu từ SQLite sang Firestore
+    public void syncComputersToFirestore() {
+        FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+        ArrayList<Computer> computers = getAllComputers();
+
+        for (Computer computer : computers) {
+            Map<String, Object> computerData = new HashMap<>();
+            computerData.put("id", computer.getId());
+            computerData.put("code", computer.getCode());
+            computerData.put("cpu", computer.getCpu());
+            computerData.put("ram", computer.getRam());
+            computerData.put("gpu", computer.getGpu());
+            computerData.put("storage", computer.getStorage());
+            computerData.put("status", computer.getStatus());
+            computerData.put("macAddress", computer.getMacAddress());
+            computerData.put("ipAddress", computer.getIpAddress());
+            computerData.put("dateAdded", computer.getDateAdded());
+
+            firestore.collection("computers")
+                    .document(String.valueOf(computer.getId()))
+                    .set(computerData)
+                    .addOnSuccessListener(aVoid -> Log.d("Firestore", "Computer synced: " + computer.getCode()))
+                    .addOnFailureListener(e -> Log.e("Firestore", "Error syncing computer: " + computer.getCode(), e));
+        }
     }
 
     // Phương thức lấy tất cả dữ liệu từ bảng Computer
@@ -222,6 +255,10 @@ public class NetCafeDatabase extends SQLiteOpenHelper {
         values.put("ipAddress", ipAddress);
         values.put("dateAdded", dateAdded);
 
-        return db.insert("Computer", null, values);
+        long result = db.insert("Computer", null, values);
+        if (result != -1) {
+            syncComputersToFirestore(); // Đồng bộ sau khi thêm máy mới
+        }
+        return result;
     }
 }
