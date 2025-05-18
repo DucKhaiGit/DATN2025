@@ -1,7 +1,9 @@
 package com.example.quanlyquannet;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Button;
 import android.widget.ListView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -21,6 +23,7 @@ public class ComputerListActivity extends AppCompatActivity {
     private FirebaseFirestore firestore;
     private ListenerRegistration firestoreListener;
 
+    private Button btnBack;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -30,6 +33,7 @@ public class ComputerListActivity extends AppCompatActivity {
         db = new NetCafeDatabase(this);
         computers = new ArrayList<>();
         firestore = FirebaseFirestore.getInstance();
+        btnBack = findViewById(R.id.btnBackToHome);
 
         // Đồng bộ dữ liệu từ SQLite sang Firestore khi khởi động
         db.syncComputersToFirestore();
@@ -40,7 +44,15 @@ public class ComputerListActivity extends AppCompatActivity {
 
         // Lắng nghe thay đổi thời gian thực từ Firestore
         listenForRealtimeUpdates();
+
+        btnBack.setOnClickListener(v -> {
+            Intent intent = new Intent(ComputerListActivity.this, MainActivity.class);
+            startActivity(intent);
+            finish();
+        });
     }
+
+
 
     private void listenForRealtimeUpdates() {
         firestoreListener = firestore.collection("computers")

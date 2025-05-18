@@ -1,149 +1,144 @@
 package com.example.quanlyquannet;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.ContextMenu;
-import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ListView;
+import android.widget.EditText;
 import android.widget.Toast;
-
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class EmployeeListActivity extends AppCompatActivity {
 
-    private ListView lvEmployees;
-    private NetCafeDatabase dbHelper;
-    private Button btnAddEmployee;
-    private ArrayAdapter<String> adapter;
-    private ArrayList<String> employeeList;
-    private ArrayList<Integer> employeeIds; // Lưu trữ ID của nhân viên
+    private RecyclerView recyclerView;
+    private EmployeeAdapter employeeAdapter;
+    private List<Employee> employeeList;
+    private FirebaseFirestore db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_employee_list);
 
-        lvEmployees = findViewById(R.id.lvEmployees);
-        btnAddEmployee = findViewById(R.id.btnAddEmployee);
-        dbHelper = new NetCafeDatabase(this);
+        recyclerView = findViewById(R.id.recyclerViewEmployees);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        // Đăng ký Context Menu cho ListView
-        registerForContextMenu(lvEmployees);
+        employeeList = new ArrayList<>();
+        employeeAdapter = new EmployeeAdapter(employeeList, this::updateEmployee, this::deleteEmployee);
+        recyclerView.setAdapter(employeeAdapter);
 
-        // Lấy danh sách nhân viên từ cơ sở dữ liệu
-        loadEmployeeList();
+        Button btnAddEmployee = findViewById(R.id.btnAddEmployee);
+        Button btnBack = findViewById(R.id.btnBack);
 
-        // Nút quay về trang chủ
-        Button btnBackToHome = findViewById(R.id.btnBackToHome);
-        btnBackToHome.setOnClickListener(v -> {
+        db = FirebaseFirestore.getInstance();
+        loadEmployees();
+
+        btnAddEmployee.setOnClickListener(v -> showAddEmployeeDialog());
+        btnBack.setOnClickListener(v -> {
             Intent intent = new Intent(EmployeeListActivity.this, MainActivity.class);
             startActivity(intent);
             finish();
         });
-
-        // Sự kiện bấm nút "Thêm Nhân Viên"
-        btnAddEmployee.setOnClickListener(v -> {
-            Intent intent = new Intent(EmployeeListActivity.this, AddEmployeeActivity.class);
-            startActivityForResult(intent, 100); // Mã yêu cầu là 100
-        });
     }
 
-    private void loadEmployeeList() {
-        // Lấy danh sách nhân viên và ID từ cơ sở dữ liệu
-        employeeList = dbHelper.getAllEmployees(); // Danh sách chứa thông tin hiển thị
-        employeeIds = dbHelper.getAllEmployeeIds(); // Danh sách chứa ID của nhân viên
-
-        if (employeeList == null || employeeIds == null) {
-            employeeList = new ArrayList<>();
-            employeeIds = new ArrayList<>();
-        }
-
-        // Thiết lập adapter cho ListView
-        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, employeeList);
-        lvEmployees.setAdapter(adapter);
-    }
-
-
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if ((requestCode == 100 || requestCode == 200) && resultCode == RESULT_OK) {
-            // Khi thêm hoặc sửa nhân viên thành công, tải lại danh sách
-            loadEmployeeList();
-            adapter.notifyDataSetChanged();
-        }
-    }
-
-    @Override
-    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-        super.onCreateContextMenu(menu, v, menuInfo);
-
-        // Tạo tiêu đề cho Context Menu
-        menu.setHeaderTitle("Chọn hành động");
-
-        // Thêm các item vào Context Menu
-        menu.add(0, 1, 0, "Sửa");
-        menu.add(0, 2, 1, "Xóa");
-    }
-
-    @Override
-    public boolean onContextItemSelected(@NonNull MenuItem item) {
-        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-        int position = info.position;
-
-        if (employeeIds == null || position < 0 || position >= employeeIds.size()) {
-            Toast.makeText(this, "Lỗi: Không thể lấy ID nhân viên!", Toast.LENGTH_SHORT).show();
-            return super.onContextItemSelected(item);
-        }
-
-        int employeeId = employeeIds.get(position);
-
-        switch (item.getItemId()) {
-            case 1: // Sửa nhân viên
-                editEmployee(employeeId);
-                return true;
-            case 2: // Xóa nhân viên
-                deleteEmployee(employeeId);
-                return true;
-            default:
-                return super.onContextItemSelected(item);
-        }
-    }
-
-
-    private void editEmployee(int employeeId) {
-        Intent intent = new Intent(EmployeeListActivity.this, AddEmployeeActivity.class);
-        intent.putExtra("EMPLOYEE_ID", employeeId); // Truyền ID nhân viên để sửa
-        startActivityForResult(intent, 200); // Mã yêu cầu là 200
-    }
-
-    private void deleteEmployee(int employeeId) {
-        // Hiển thị hộp thoại xác nhận
-        new AlertDialog.Builder(this)
-                .setTitle("Xóa nhân viên")
-                .setMessage("Bạn có chắc chắn muốn xóa nhân viên này?")
-                .setPositiveButton("Có", (dialog, which) -> {
-                    // Xóa nhân viên khỏi cơ sở dữ liệu
-                    boolean result = dbHelper.deleteEmployeeById(employeeId);
-                    if (result) {
-                        Toast.makeText(this, "Xóa nhân viên thành công!", Toast.LENGTH_SHORT).show();
-                        loadEmployeeList();
-                        adapter.notifyDataSetChanged();
+    private void loadEmployees() {
+        db.collection("employees")
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        employeeList.clear();
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            String id = document.getId();
+                            String name = document.getString("name");
+                            String role = document.getString("role");
+                            Long salary = document.getLong("salary");
+                            if (name != null && role != null && salary != null) {
+                                employeeList.add(new Employee(id, name, role, salary));
+                            }
+                        }
+                        employeeAdapter.notifyDataSetChanged();
                     } else {
-                        Toast.makeText(this, "Xóa nhân viên thất bại!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, "Lỗi tải danh sách: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                     }
+                });
+    }
+
+    private void showAddEmployeeDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Thêm nhân viên");
+
+        View view = getLayoutInflater().inflate(R.layout.dialog_add_employee, null);
+        builder.setView(view);
+
+        EditText etName = view.findViewById(R.id.etName);
+        EditText etRole = view.findViewById(R.id.etRole);
+        EditText etSalary = view.findViewById(R.id.etSalary);
+
+        builder.setPositiveButton("Thêm", (dialog, which) -> {
+            String name = etName.getText().toString();
+            String role = etRole.getText().toString();
+            String salaryStr = etSalary.getText().toString();
+            if (!name.isEmpty() && !role.isEmpty() && !salaryStr.isEmpty()) {
+                long salary = Long.parseLong(salaryStr);
+                addEmployee(name, role, salary);
+            }
+        });
+        builder.setNegativeButton("Hủy", (dialog, which) -> dialog.cancel());
+        builder.show();
+    }
+
+    private void addEmployee(String name, String role, long salary) {
+        Map<String, Object> employee = new HashMap<>();
+        employee.put("name", name);
+        employee.put("role", role);
+        employee.put("salary", salary);
+
+        db.collection("employees")
+                .add(employee)
+                .addOnSuccessListener(documentReference -> {
+                    Toast.makeText(this, "Thêm nhân viên thành công!", Toast.LENGTH_SHORT).show();
+                    loadEmployees();
                 })
-                .setNegativeButton("Không", null)
-                .show();
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, "Lỗi thêm nhân viên: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
+    }
+
+    private void updateEmployee(String employeeId, String name, String role, long salary) {
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("name", name);
+        updates.put("role", role);
+        updates.put("salary", salary);
+
+        db.collection("employees").document(employeeId)
+                .update(updates)
+                .addOnSuccessListener(aVoid -> {
+                    Toast.makeText(this, "Cập nhật nhân viên thành công!", Toast.LENGTH_SHORT).show();
+                    loadEmployees();
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, "Lỗi cập nhật: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
+    }
+
+    private void deleteEmployee(String employeeId) {
+        db.collection("employees").document(employeeId)
+                .delete()
+                .addOnSuccessListener(aVoid -> {
+                    Toast.makeText(this, "Xóa nhân viên thành công!", Toast.LENGTH_SHORT).show();
+                    loadEmployees();
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, "Lỗi xóa: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
     }
 }

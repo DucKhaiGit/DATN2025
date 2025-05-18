@@ -61,6 +61,11 @@ public class MainActivity extends AppCompatActivity {
             employeeMenuItem.setEnabled(false);
         }
 
+        if (role.equals("guest")) {
+            MenuItem guestMenuItem = bottomNavigationView.getMenu().findItem(R.id.nav_guests);
+            guestMenuItem.setEnabled(false);
+        }
+
         // Xử lý sự kiện khi chọn item trong BottomNavigationView
         bottomNavigationView.setOnItemSelectedListener(new BottomNavigationView.OnItemSelectedListener() {
             @Override
@@ -74,9 +79,9 @@ public class MainActivity extends AppCompatActivity {
                     Intent employeeIntent = new Intent(MainActivity.this, EmployeeListActivity.class);
                     startActivity(employeeIntent);
                     return true;
-                } else if (item.getItemId() == R.id.nav_payments) {
-//                    Intent paymentIntent = new Intent(MainActivity.this, PaymentListActivity.class);
-//                    startActivity(paymentIntent);
+                } else if (item.getItemId() == R.id.nav_guests) {
+                    Intent intent = new Intent(MainActivity.this, AccountListActivity.class);
+                    startActivity(intent);
                     return true;
                 } else if (item.getItemId() == R.id.nav_settings) {
                     Intent settingsIntent = new Intent(MainActivity.this, SettingsActivity.class);

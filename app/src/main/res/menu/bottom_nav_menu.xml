@@ -8,9 +8,9 @@
         android:icon="@drawable/icon_employee"
         android:title="Nhân Viên" />
     <item
-        android:id="@+id/nav_payments"
+        android:id="@+id/nav_guests"
         android:icon="@drawable/icon_bill"
-        android:title="Hóa Đơn" />
+        android:title="Khách hàng" />
 
     <item
         android:id="@+id/nav_settings"

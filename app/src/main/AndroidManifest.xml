@@ -54,6 +54,9 @@
         <activity
             android:name=".SettingsActivity"
             android:exported="false" />
+        <activity
+            android:name=".AccountListActivity"
+            android:exported="false" />
 
     </application>
 </manifest>
