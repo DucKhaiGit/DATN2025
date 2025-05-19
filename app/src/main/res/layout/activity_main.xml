@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:background="#F5F5F5">
 
-    <!-- Header với lời chào, số dư và icon đăng xuất -->
+    <!-- Header với lời chào, số dư, giá thuê và icon đăng xuất -->
     <androidx.cardview.widget.CardView
         android:id="@+id/header_card"
         android:layout_width="match_parent"
@@ -58,6 +58,32 @@
                 android:contentDescription="Đăng xuất"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintEnd_toEndOf="parent" />
+
+            <!-- TextView hiển thị giá thuê (căn giữa) -->
+            <TextView
+                android:id="@+id/tv_hourly_rate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Giá thuê/giờ: Chưa thiết lập"
+                android:textSize="16sp"
+                android:textColor="#4CAF50"
+                android:visibility="gone"
+                app:layout_constraintTop_toBottomOf="@id/btn_logout"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginTop="16dp" />
+
+            <!-- Nút sửa giá thuê (dưới dòng giá thuê) -->
+            <Button
+                android:id="@+id/btn_edit_hourly_rate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Sửa giá thuê"
+                app:layout_constraintTop_toBottomOf="@id/tv_hourly_rate"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginTop="8dp" />
+
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
 
